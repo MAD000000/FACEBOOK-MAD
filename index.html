@@ -1,61 +1,81 @@
 <!doctype html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع فيسبوك</title>
-    <link rel="stylesheet" href="styles.css">
-<style type="text/css" id="dcoder_stylesheet">body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
-    margin: 0;
-    padding: 0;
-    text-align: center;
+<html lang="en"> 
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Simple Chat App</title> 
+  <link rel="stylesheet" href="style.css"> 
+ <style type="text/css" id="dcoder_stylesheet">#chat-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 10px;
 }
-
-.container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+#chat-box {
+    border: 1px solid #ccc;
+    height: 300px;
+    overflow-y: scroll;
+    margin-bottom: 10px;
 }
-
-h1 {
-    color: #4267b2;
+#message-input {
+    width: 80%;
+    padding: 10px;
 }
+#send-button {
+    padding: 10px;
+}</style></head> 
+ <body> 
+  <div id="chat-container"> 
+   <div id="chat-box"></div> 
+   <input type="text" id="message-input" placeholder="Enter your message"> <button id="send-button">Send</button> 
+  </div> 
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script> 
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script> 
+  <script src="script.js"></script> 
+ 
+<script type="text/javascript" id="dcoder_script">// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, onValue } from "firebase/database";
 
-.buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD4TgIDk8c3a4XRCP6DIvYP2PHCqVW8lGU",
+  authDomain: "mads-31a8a.firebaseapp.com",
+  projectId: "mads-31a8a",
+  storageBucket: "mads-31a8a.appspot.com",
+  messagingSenderId: "867173819443",
+  appId: "1:867173819443:web:747857f8f4ab7078b12f46",
+  measurementId: "G-D6W1TMLTE7"
+};
 
-.button {
-    display: inline-block;
-    padding: 10px 20px;
-    color: #ffffff;
-    background-color: #4267b2;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 18px;
-    transition: background-color 0.3s ease;
-}
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
 
-.button:hover {
-    background-color: #365899;
-}
-</style></head>
-<body>
-    <div class="container">
-        <h1>موقع فيسبوك</h1>
-        <div class="buttons">
-            <a href="login.html" class="button">تسجيل الدخول</a>
-            <a href="register.html" class="button">تسجيل</a>
-            <a href="contact.html" class="button">اتصل بنا</a>
-        </div>
-    </div>
+const chatBox = document.getElementById('chat-box');
+const messageInput = document.getElementById('message-input');
+const sendButton = document.getElementById('send-button');
 
-</body></html>
+// Send message to Firebase
+sendButton.addEventListener('click', () => {
+  const message = messageInput.value;
+  if (message) {
+    const newMessageRef = ref(database, 'messages/' + Date.now());
+    set(newMessageRef, {
+      text: message
+    });
+    messageInput.value = '';
+  }
+});
+
+// Listen for new messages
+const messagesRef = ref(database, 'messages');
+onValue(messagesRef, (snapshot) => {
+  chatBox.innerHTML = ''; // Clear chat box
+  snapshot.forEach((childSnapshot) => {
+    const message = childSnapshot.val().text;
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    chatBox.appendChild(messageElement);
+  });
+});
+</script></body></html>
